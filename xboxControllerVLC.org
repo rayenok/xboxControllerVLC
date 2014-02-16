@@ -1,0 +1,71 @@
+#+TITLE:     xboxControllerVLC
+#+AUTHOR:    rayenok
+#+EMAIL:     rayenok@faye
+#+DATE:      2014-02-15 sáb
+#+DESCRIPTION:
+#+KEYWORDS:
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   
+#+LINK_HOME: 
+#+XSLT:
+
+* Description
+Simple program to control some basic operations of vlc player and amixer using the xbox 360 controller
+* Code
+#+NAME: xboxVLC
+#+BEGIN_SRC python :results silent :tangle src/xboxVLC.py :noweb yes
+  #!/usr/bin/python2.7
+  import os,time,pygame
+  from pygame.locals import *
+  
+  
+  def buttonsController(nButton):
+      # A: 0
+      # B: 1
+      # X: 2
+      # Y: 3
+      # LB: 4
+      # RB: 5
+      # RB: 5
+      # back: 6
+      # start: 7
+      if nButton == 0:
+          # A controller -> reduce the volume
+          os.system('amixer -q set Master 5%-')
+      elif nButton == 1:
+          # B controller -> play next
+          os.system('dbus-send --session --type=method_call --print-reply --dest=org.mpris.MediaPlayer2.vlc /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Next')
+      elif nButton == 2:
+          # X controller -> play previous
+          os.system('dbus-send --session --type=method_call --print-reply --dest=org.mpris.MediaPlayer2.vlc /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous')
+      elif nButton == 3:
+          # Y controller -> increase the volume
+          os.system('amixer -q set Master 5%+')
+      elif nButton == 7:
+          # Y controller -> increase the volume
+          os.system('dbus-send --session --type=method_call --print-reply --dest=org.mpris.MediaPlayer2.vlc /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause')
+  
+  
+  pygame.init()
+  joystick = pygame.joystick.Joystick(0)
+  joystick.init()
+  time.sleep(5)
+  while 1:
+      try:
+          for event in pygame.event.get():
+                  if event.type == JOYBUTTONDOWN:
+                      # logging.log(10,"Down: "+str(event.button))
+                      buttonsController(event.button)
+      except:
+          pass
+  
+  
+#+END_SRC
+* Documentation
+- http://pygame.org/download.shtml
+- http://www.pygame.org/docs/ref/joystick.html
